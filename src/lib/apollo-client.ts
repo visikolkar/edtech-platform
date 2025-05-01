@@ -1,7 +1,7 @@
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 
 const client = new ApolloClient({
-  uri: "https://nexus-horizon.hasura.app/v1/graphql",
+  uri: "/api/graphql",
   cache: new InMemoryCache(),
 });
 
