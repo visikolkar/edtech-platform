@@ -8,6 +8,7 @@ import { FiEdit, FiLogOut, FiUser } from "react-icons/fi";
 import styles from "../../../styles/CourseDetails.module.css";
 
 type User = {
+  id: string;
   name: string;
 };
 
@@ -41,6 +42,7 @@ const GET_COURSE_BY_ID = gql`
       level
       enrollments {
         user {
+          id
           name
         }
         role
@@ -74,6 +76,10 @@ export default function CourseDetails() {
     { insert_enrollments_one: { id: string } },
     EnrollmentVariables
   >(ENROLL_USER);
+
+  const isUserEnrolled = data?.courses_by_pk.enrollments.some(
+    (enrollment) => enrollment.user.id === user?.id
+  );
 
   const handleEnroll = async (role: "student" | "professor") => {
     if (!user || !courseId) {
@@ -160,25 +166,35 @@ export default function CourseDetails() {
 
       {/* Enrollment Section */}
       {user ? (
-        <div className={styles.enrollmentSection}>
-          <h2 className={styles.enrollmentTitle}>Enroll as:</h2>
-          <div className={styles.buttonGroup}>
-            <button
-              className={`${styles.button} ${styles.studentButton}`}
-              onClick={() => handleEnroll("student")}
-              disabled={isEnrolling}
-            >
-              {isEnrolling ? "Processing..." : "Student"}
-            </button>
-            <button
-              className={`${styles.button} ${styles.professorButton}`}
-              onClick={() => handleEnroll("professor")}
-              disabled={isEnrolling}
-            >
-              {isEnrolling ? "Processing..." : "Professor"}
-            </button>
-          </div>
-        </div>
+        <>
+          {!isUserEnrolled ? (
+            <div className={styles.enrollmentSection}>
+              <h2 className={styles.enrollmentTitle}>Enroll as:</h2>
+              <div className={styles.buttonGroup}>
+                <button
+                  className={`${styles.button} ${styles.studentButton}`}
+                  onClick={() => handleEnroll("student")}
+                  disabled={isEnrolling || user.globalRole !== "student"}
+                >
+                  {isEnrolling ? "Processing..." : "Student"}
+                </button>
+                <button
+                  className={`${styles.button} ${styles.professorButton}`}
+                  onClick={() => handleEnroll("professor")}
+                  disabled={isEnrolling || user.globalRole !== "professor"}
+                >
+                  {isEnrolling ? "Processing..." : "Professor"}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className={styles.enrollmentSection}>
+              <h2 className={styles.enrollmentTitle}>
+                You have enrolled for this course!
+              </h2>
+            </div>
+          )}
+        </>
       ) : (
         <div className={styles.loginSection}>
           <MockLogin />
