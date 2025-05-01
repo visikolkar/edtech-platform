@@ -1,16 +1,17 @@
 import { useQuery } from "@apollo/client";
 import { gql } from "@apollo/client";
 import Link from "next/link";
+import styles from "../styles/Home.module.css";
 
-type TCourse = {
+type Course = {
   id: string;
   title: string;
   description: string;
   level: string;
 };
 
-type TCoursesData = {
-  courses: TCourse[];
+type CoursesData = {
+  courses: Course[];
 };
 
 const GET_ALL_COURSES = gql`
@@ -25,26 +26,32 @@ const GET_ALL_COURSES = gql`
 `;
 
 export default function Home() {
-  const { loading, error, data } = useQuery<TCoursesData>(GET_ALL_COURSES);
+  const { loading, error, data } = useQuery<CoursesData>(GET_ALL_COURSES);
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  if (loading) return <div className={styles.loading}>Loading courses...</div>;
+  if (error) return <div className={styles.error}>Error: {error.message}</div>;
 
   return (
-    <div>
-      <h1>Available Courses</h1>
-      <ul>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1 className={styles.title}>Available Courses</h1>
+      </div>
+
+      <div className={styles.courseGrid}>
         {data?.courses.map((course) => (
-          <li key={course.id}>
-            <Link href={`/courses/${course.id}`}>
-              <h2>{course.title}</h2>
-              <p>
-                {course.description} (Level: {course.level})
-              </p>
+          <div key={course.id} className={styles.courseCard}>
+            <Link className={styles.coureseLink} href={`/courses/${course.id}`}>
+              <div className={styles.courseContent}>
+                <h2 className={styles.courseTitle}>{course.title}</h2>
+                <p className={styles.courseDescription}>{course.description}</p>
+                <span className={styles.courseLevel}>
+                  Level: {course.level}
+                </span>
+              </div>
             </Link>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }
