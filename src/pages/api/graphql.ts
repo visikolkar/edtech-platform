@@ -15,7 +15,7 @@ export default async function handler(
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-hasura-admin-secret": process.env.HASURA_ADMIN_SECRET!,
+          "x-hasura-admin-secret": process.env.NEXT_PUBLIC_HASURA_SECRET!,
         },
         body: JSON.stringify(req.body),
       }
